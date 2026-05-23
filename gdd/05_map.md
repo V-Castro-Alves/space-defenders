@@ -14,28 +14,16 @@ The map runs on a 2D tile layout optimized for clean coordinate math and clear v
 
 ---
 
-## 5.2 Grid Layout — The Z-Path with Central Loop
+## 5.2 Grid Layout — The Split-Stream Corridor (Switchback)
 
-The prototype map features a structured path stretching from the top-left to the bottom-right of the viewport. It shapes a "Z" with an orbital loop in the center:
+The map features a triple-corridor snaking switchback layout designed to establish isolated localized combat zones and prevent global coverage overlap:
 
 ```
- ┌────────────────────────────────────────────────────────┐
- │ ★ [0, 1] ══════════════════════════════════╗           │
- │                                            ║           │
- │                                      ╔═════╝           │
- │                                      ║                 │
- │                                 ┌────╜                 │
- │                                 │   [Loop Area]        │
- │                                 └────╖                 │
- │                                      ║                 │
- │                                      ╚═════════════ ■  │
- │                                                 [31, 16]│
- └────────────────────────────────────────────────────────┘
-  ★ = Asteroid Entry Spawner (Top-Left)    ■ = Space Station Exit (Bottom-Right)
+ Entry (left) -> Corridor A (Right to U-Turn 1) -> Corridor B (Left to U-Turn 2) -> Corridor C (Right to Space Station Exit)
 ```
 
-### Tactical Choke Point
-The central loop acts as the primary focal point of the defense system. Ships placed near or inside the loop area possess overlapping coverages, allowing them to target incoming asteroids twice: once as they enter the loop, and again as they round the bend and exit. This represents the highest value real estate on the map.
+### Tactical localized zones
+By forcing tight 180° turns and snaking lanes that segment the grid vertically, this layout restricts long-range cross-lane firing. Defensive structures must be placed tactically in local zones to target local corridors, creating distinct high-value kill zones at each U-turn corridor bend.
 
 ---
 
@@ -53,16 +41,18 @@ All grid tiles must be explicitly flagged in the game engine to govern movement 
 
 ## 5.4 Waypoints Array (GDScript Reference)
 
-The exact coordinates of the path nodes will be loaded into the `RoundManager` as an array of 2D coordinates.
+The exact coordinates of the path nodes loaded in the `main.gd` filegoverns asteroid path-following:
 
 ```gdscript
-# RoundManager path coordinate array (to be finalized in Phase 2)
-var path_waypoints: Array[Vector2] = [
-	Vector2(0, 1),    # Start at top-left
-	Vector2(24, 1),   # First turn down
-	Vector2(24, 5),   # Left turn
-	Vector2(16, 5),   # Loop entrance
-	# ... (Loop coordinates) ...
-	Vector2(31, 16)   # Space station exit at bottom-right
+# Main.gd path coordinate array for snaking Switchback layout
+var waypoints = [
+	Vector2(-64, 160),   # Spawner Start (left offscreen)
+	Vector2(1600, 160),  # Corridor A end / turn down
+	Vector2(1600, 480),  # U-Turn 1 down
+	Vector2(192, 480),   # Corridor B end / turn down
+	Vector2(192, 800),   # U-Turn 2 down
+	Vector2(1600, 800),  # Corridor C end / turn down
+	Vector2(1600, 960),  # Final Exit turn down
+	Vector2(1728, 960)   # Space Station Exit (Right sidebar boundary)
 ]
 ```

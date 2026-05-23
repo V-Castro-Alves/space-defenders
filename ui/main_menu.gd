@@ -83,7 +83,7 @@ func _ready():
 	var btn_normal = Button.new()
 	btn_normal.custom_minimum_size.y = 72
 	btn_normal.add_theme_font_size_override("font_size", 20)
-	btn_normal.text = "NORMAL MODE\n💎 50 | ❤️ 20"
+	btn_normal.text = "NORMAL MODE\n💎 200 | ❤️ 20"
 	
 	var style_normal = StyleBoxFlat.new()
 	style_normal.bg_color = Color(0.08, 0.16, 0.1, 0.8)
@@ -147,12 +147,11 @@ func _ready():
 	btn_help.add_theme_stylebox_override("pressed", style_help)
 	btn_help.pressed.connect(_on_help_pressed)
 	vbox.add_child(btn_help)
-
 func _on_normal_pressed():
 	# Configure Normal Mode starting states
 	GameManager.dev_mode = false
 	GameManager.lives = 20
-	EconomyManager.minerals = 50
+	EconomyManager.minerals = 200
 	
 	# Transition Phase to preparing & clear menu overlay
 	GameManager.current_phase = GameManager.GamePhase.ROUND_PREPARATION

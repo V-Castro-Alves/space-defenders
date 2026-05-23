@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameManager="*res://autoloads/game_manager.gd"
 EconomyManager="*res://autoloads/economy_manager.gd"
 RoundManager="*res://autoloads/round_manager.gd"
+MetricsManager="*res://autoloads/metrics_manager.gd"
 
 [display]
 

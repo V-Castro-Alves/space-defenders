@@ -46,6 +46,8 @@ func _ready():
 	add_child(collision)
 	
 	setup_type(ship_type)
+	if not is_ghost:
+		MetricsManager.record_tower_placement(ship_type, base_cost)
 	queue_redraw()
 
 func setup_type(type: String):
@@ -53,43 +55,43 @@ func setup_type(type: String):
 	match ship_type:
 		"Scout":
 			display_name = "Scout"
-			base_cost = 20
-			range_tiles = 2.0
+			base_cost = 75
+			range_tiles = 1.5
 			fire_rate = 1.0
 			damage = 1
 			ship_color = Color("#22c55e") # Green
 		"Laser Frigate":
 			display_name = "Laser Frigate"
-			base_cost = 35
-			range_tiles = 5.0
+			base_cost = 150
+			range_tiles = 3.0
 			fire_rate = 1.0
 			damage = 2
 			ship_color = Color("#06b6d4") # Cyan
 		"Missile Cruiser":
 			display_name = "Missile Cruiser"
-			base_cost = 45
-			range_tiles = 4.0
+			base_cost = 220
+			range_tiles = 2.5
 			fire_rate = 0.8
 			damage = 1
 			ship_color = Color("#a855f7") # Purple
 		"Pulse Beam":
 			display_name = "Pulse Beam"
-			base_cost = 55
-			range_tiles = 3.5
+			base_cost = 300
+			range_tiles = 2.0
 			fire_rate = 0.5
 			damage = 1
 			ship_color = Color("#f59e0b") # Warm gold
 		"Ion Cannon":
 			display_name = "Ion Cannon"
-			base_cost = 60
-			range_tiles = 5.0
+			base_cost = 450
+			range_tiles = 3.0
 			fire_rate = 0.5
 			damage = 3
 			ship_color = Color("#3b82f6") # Blue
 		"Drone Carrier":
 			display_name = "Drone Carrier"
-			base_cost = 75
-			range_tiles = 4.0
+			base_cost = 550
+			range_tiles = 2.5
 			fire_rate = 0.8
 			damage = 1
 			ship_color = Color("#ec4899") # Pink
@@ -102,8 +104,8 @@ func setup_type(type: String):
 					drones.append(drone)
 		"Gravity Well":
 			display_name = "Gravity Well"
-			base_cost = 80
-			range_tiles = 4.0
+			base_cost = 600
+			range_tiles = 3.0
 			fire_rate = 1.0 / 6.0
 			damage = 0
 			ship_color = Color("#ffffff") # White
@@ -370,6 +372,7 @@ func _shoot():
 			var p = proj_scene.instantiate()
 			p.damage = damage
 			p.target = target
+			p.source_ship_type = "Scout"
 			p.global_position = global_position
 			
 			var p_color = ship_color
@@ -391,6 +394,7 @@ func _shoot():
 			var p = proj_scene.instantiate()
 			p.damage = damage
 			p.target = target
+			p.source_ship_type = "Ion Cannon"
 			p.global_position = global_position
 			p.projectile_color = ship_color
 			p.shot_type = "Heavy"
@@ -402,6 +406,7 @@ func _shoot():
 			var p = proj_scene.instantiate()
 			p.damage = damage
 			p.target = target
+			p.source_ship_type = "Missile Cruiser"
 			p.splash_radius = 96.0 # 1.5 tiles
 			p.global_position = global_position
 			p.projectile_color = ship_color
@@ -437,7 +442,7 @@ func _shoot():
 					# Check distance from asteroid point to laser line segment
 					var closest = Geometry2D.get_closest_point_to_segment(ast.global_position, global_position, end_pos)
 					if ast.global_position.distance_to(closest) < (ast.size / 2.0 + 8.0):
-						ast.take_damage(damage, s_type)
+						ast.take_damage(damage, s_type, "Laser Frigate")
 						
 		"Pulse Beam":
 			# Sweep to densest cluster center and lock rotation
@@ -462,7 +467,7 @@ func _shoot():
 					var angle_to_ast = relative_vector.angle()
 					var angle_diff = abs(angle_to_local_angle(angle_to_ast - pulse_beam_angle))
 					if angle_diff <= PI / 4.0:
-						ast.take_damage(damage, "Kinetic")
+						ast.take_damage(damage, "Kinetic", "Pulse Beam")
 
 func _shoot_drone(index: int, drone_target: Node2D):
 	if not is_instance_valid(drone_target):
@@ -478,6 +483,7 @@ func _shoot_drone(index: int, drone_target: Node2D):
 	var p = proj_scene.instantiate()
 	p.damage = 1
 	p.target = drone_target
+	p.source_ship_type = "Drone Carrier"
 	p.speed = 800.0 # Drone shots are fast
 	p.global_position = d_pos
 	p.projectile_color = Color("#f472b6")

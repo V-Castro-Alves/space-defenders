@@ -130,12 +130,13 @@ Play the `test_runner.tscn` scene in Godot and ensure that your new test passes 
 
 ## 📚 Documentation Maintenance Guidelines
 
-Whenever you introduce architectural refactorings, add new features, adjust design parameters (such as changing the game terminology, e.g., "Rounds" to "Rounds"), or fix bugs, you **must** update the corresponding documentation files:
-- **GDD Files**: Keep the modular Game Design Documents located in the [gdd/](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/gdd) folder (e.g., `01_game_overview.md`, `06_round_system.md`, etc.) aligned with the current gameplay specification.
-- **Project README**: Make sure the root [README.md](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/README.md) reflects high-level feature sets and configuration terms correctly.
-- **Developer Guide**: Keep this [gemini.md](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/gemini.md) guide updated with changes to window sizes, placement math buffers, and regression test rules.
-
-Always double-check that filenames are renamed accordingly if a core concept changes (e.g., renaming `06_round_system.md` to `06_round_system.md`).
+> [!IMPORTANT]
+> **CRITICAL RULE**: Whenever you make a balance change, adjust gameplay values (e.g., ship costs, ranges, swarm density), refactor architecture, or resolve bugs, you **MUST** proactively update the corresponding documentation:
+> 1. **GDD Files**: Keep the modular Game Design Documents located in the [gdd/](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/gdd) folder (e.g., [04_spaceships.md](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/gdd/04_spaceships.md), [06_round_system.md](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/gdd/06_round_system.md)) fully synchronized with the actual variables.
+> 2. **Project README**: Make sure the root [README.md](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/README.md) is updated if core game concepts or terms change.
+> 3. **Developer Guide**: Keep this [gemini.md](file:///wsl.localhost/Ubuntu/home/vitor/projects/games/tower-defense/gemini.md) guide updated with changes to layouts, coordinate bounds, or testing protocols.
+> 
+> Failing to keep the GDD and specs in sync with code is not allowed. Always verify and document changes immediately.
 
 ---
 

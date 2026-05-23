@@ -77,6 +77,11 @@ Below is the directory map of the modular GDD:
 - Open Questions & TBD parameters
 - Future Scope (comets, asteroid belts, boss variants, extra maps)
 
+### 📊 [11. Metrics & Balance Logging](11_metrics_system.md)
+*GDD specifications for the playthrough telemetry engine, harvested variables, and report serializations.*
+- Playthrough Telemetry Data Model
+- File path structures & JSON/Markdown formats
+
 ---
 
 ## Document Meta

@@ -2,13 +2,13 @@ extends Node
 
 signal minerals_changed(current_minerals)
 
-var minerals: int = 50 : set = set_minerals
+var minerals: int = 200 : set = set_minerals
 
 func _ready():
 	reset_economy()
 
 func reset_economy():
-	self.minerals = 50
+	self.minerals = 200
 
 func set_minerals(value: int):
 	minerals = max(0, value)

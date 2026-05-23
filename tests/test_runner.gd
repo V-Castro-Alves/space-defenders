@@ -35,35 +35,35 @@ func _ready():
 	# ----------------------------------------------------
 	log_text += "[RUN] Testing Economy and Upgrade Net Value...\n"
 	EconomyManager.reset_economy()
-	if EconomyManager.minerals != 50:
-		log_text += "  [FAIL] Starting minerals is not 50 (got %d)\n" % EconomyManager.minerals
+	if EconomyManager.minerals != 200:
+		log_text += "  [FAIL] Starting minerals is not 200 (got %d)\n" % EconomyManager.minerals
 		passed = false
 	else:
-		log_text += "  [PASS] Starting minerals is 50\n"
+		log_text += "  [PASS] Starting minerals is 200\n"
 		
-	# GDD: Repositioning a Scout (cost 20) costs 15% (3 minerals)
-	var repo_fee = EconomyManager.get_reposition_fee(20)
-	if repo_fee != 3:
-		log_text += "  [FAIL] Reposition fee for Scout is wrong (got %d, expected 3)\n" % repo_fee
+	# GDD: Repositioning a Scout (cost 75) costs 15% (12 minerals)
+	var repo_fee = EconomyManager.get_reposition_fee(75)
+	if repo_fee != 12:
+		log_text += "  [FAIL] Reposition fee for Scout is wrong (got %d, expected 12)\n" % repo_fee
 		passed = false
 	else:
-		log_text += "  [PASS] Reposition fee for Scout is 3 minerals\n"
+		log_text += "  [PASS] Reposition fee for Scout is 12 minerals\n"
 		
-	# GDD: Selling a base Scout (cost 20) returns 70% (14 minerals)
-	var base_refund = EconomyManager.get_sell_refund(20)
-	if base_refund != 14:
-		log_text += "  [FAIL] Sell refund for base Scout is wrong (got %d, expected 14)\n" % base_refund
+	# GDD: Selling a base Scout (cost 75) returns 70% (52 minerals)
+	var base_refund = EconomyManager.get_sell_refund(75)
+	if base_refund != 52:
+		log_text += "  [FAIL] Sell refund for base Scout is wrong (got %d, expected 52)\n" % base_refund
 		passed = false
 	else:
-		log_text += "  [PASS] Sell refund for base Scout is 14 minerals\n"
+		log_text += "  [PASS] Sell refund for base Scout is 52 minerals\n"
 		
-	# GDD: Selling an upgraded Scout (cost 20 + 25 Hot Laser) returns 70% of total (31 minerals)
-	var upgraded_refund = EconomyManager.get_sell_refund(20 + 25)
-	if upgraded_refund != 31:
-		log_text += "  [FAIL] Sell refund for upgraded Scout is wrong (got %d, expected 31)\n" % upgraded_refund
+	# GDD: Selling an upgraded Scout (cost 75 + 25 Hot Laser) returns 70% of total (70 minerals)
+	var upgraded_refund = EconomyManager.get_sell_refund(75 + 25)
+	if upgraded_refund != 70:
+		log_text += "  [FAIL] Sell refund for upgraded Scout is wrong (got %d, expected 70)\n" % upgraded_refund
 		passed = false
 	else:
-		log_text += "  [PASS] Sell refund for upgraded Scout is 31 minerals (70% of 45)\n"
+		log_text += "  [PASS] Sell refund for upgraded Scout is 70 minerals (70% of 100)\n"
 		
 	# ----------------------------------------------------
 	# Test 2: Asteroid Splitting & Core HP Physics
@@ -339,11 +339,11 @@ func _ready():
 	
 	# Try Normal Mode start
 	menu_test._on_normal_pressed()
-	if GameManager.dev_mode or GameManager.lives != 20 or EconomyManager.minerals != 50:
+	if GameManager.dev_mode or GameManager.lives != 20 or EconomyManager.minerals != 200:
 		log_text += "  [FAIL] Normal Mode protocol set incorrect parameters (lives %d, minerals %d)\n" % [GameManager.lives, EconomyManager.minerals]
 		passed = false
 	else:
-		log_text += "  [PASS] Normal Mode launch protocol successfully sets 50 minerals and 20 lives\n"
+		log_text += "  [PASS] Normal Mode launch protocol successfully sets 200 minerals and 20 lives\n"
 		
 	# Try Dev Mode start
 	var menu_test2 = menu_class.new()
@@ -375,7 +375,7 @@ func _ready():
 	# Reset back to Normal Mode to avoid polluting normal gameplay after tests
 	GameManager.dev_mode = false
 	GameManager.lives = 20
-	EconomyManager.minerals = 50
+	EconomyManager.minerals = 200
 	
 	# ----------------------------------------------------
 	# Test 9: Threat Database Profiles & Previews
@@ -401,7 +401,7 @@ func _ready():
 		log_text += "  [PASS] Threat profiles successfully match GDD speed, tier, and element criteria\n"
 		
 	var scout_data = db_test.ship_profiles.get("Scout", {})
-	if scout_data.get("cost") != "💎 20 Minerals" or scout_data.get("range") != "2.0 Tiles (128 px)":
+	if scout_data.get("cost") != "💎 75 Minerals" or scout_data.get("range") != "1.5 Tiles (96 px)":
 		log_text += "  [FAIL] Fleet Registry profile attributes mismatched GDD specifications\n"
 		passed = false
 	else:

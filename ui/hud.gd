@@ -104,13 +104,13 @@ func _ready():
 	
 	# The 7 ship registry items
 	var shop_items = [
-		{"name": "Scout", "cost": 20, "color": Color("#22c55e")},
-		{"name": "Laser Frigate", "cost": 35, "color": Color("#06b6d4")},
-		{"name": "Missile Cruiser", "cost": 45, "color": Color("#a855f7")},
-		{"name": "Pulse Beam", "cost": 55, "color": Color("#f59e0b")},
-		{"name": "Ion Cannon", "cost": 60, "color": Color("#3b82f6")},
-		{"name": "Drone Carrier", "cost": 75, "color": Color("#ec4899")},
-		{"name": "Gravity Well", "cost": 80, "color": Color("#ffffff")}
+		{"name": "Scout", "cost": 75, "color": Color("#22c55e")},
+		{"name": "Laser Frigate", "cost": 150, "color": Color("#06b6d4")},
+		{"name": "Missile Cruiser", "cost": 220, "color": Color("#a855f7")},
+		{"name": "Pulse Beam", "cost": 300, "color": Color("#f59e0b")},
+		{"name": "Ion Cannon", "cost": 450, "color": Color("#3b82f6")},
+		{"name": "Drone Carrier", "cost": 550, "color": Color("#ec4899")},
+		{"name": "Gravity Well", "cost": 600, "color": Color("#ffffff")}
 	]
 	
 	for item in shop_items:

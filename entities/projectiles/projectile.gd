@@ -7,6 +7,7 @@ var target: Node2D = null
 var splash_radius: float = 0.0 # If > 0, AoE damage is applied
 var projectile_color: Color = Color("#f59e0b") # Warm amber/yellow
 var shot_type: String = "Weak"
+var source_ship_type: String = ""
 
 func _ready():
 	top_level = true
@@ -41,7 +42,7 @@ func _on_area_entered(area):
 		if splash_radius > 0.0:
 			_explode(asteroid)
 		else:
-			asteroid.take_damage(damage, shot_type)
+			asteroid.take_damage(damage, shot_type, source_ship_type)
 			
 		queue_free()
 
@@ -61,4 +62,4 @@ func _explode(_primary_target: Node2D):
 			var dist = global_position.distance_to(ast.global_position)
 			if dist <= splash_radius:
 				# Apply damage to all in radius
-				ast.take_damage(damage, "Splash")
+				ast.take_damage(damage, "Splash", source_ship_type)

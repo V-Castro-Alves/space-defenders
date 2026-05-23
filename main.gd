@@ -25,18 +25,15 @@ func _ready():
 	bg.z_index = -100
 	add_child(bg)
 	
-	# Path Waypoints (Z-path with loop in middle)
+	# Path Waypoints (Snaking triple-corridor layout)
 	var waypoints = [
-		Vector2(-64, 128),
-		Vector2(1472, 128),
-		Vector2(1472, 448),
-		Vector2(1152, 448),
-		Vector2(960, 448),
-		Vector2(960, 704),
-		Vector2(1280, 704),
-		Vector2(1280, 576),
-		Vector2(1152, 576),
-		Vector2(1152, 960),
+		Vector2(-64, 160),
+		Vector2(1600, 160),
+		Vector2(1600, 480),
+		Vector2(192, 480),
+		Vector2(192, 800),
+		Vector2(1600, 800),
+		Vector2(1600, 960),
 		Vector2(1728, 960)
 	]
 	
@@ -254,13 +251,13 @@ func _spawn_placed_ship(type: String, pos: Vector2):
 
 func _get_ship_cost(type: String) -> int:
 	match type:
-		"Scout": return 20
-		"Laser Frigate": return 35
-		"Missile Cruiser": return 45
-		"Ion Cannon": return 60
-		"Drone Carrier": return 75
-		"Pulse Beam": return 55
-		"Gravity Well": return 80
+		"Scout": return 75
+		"Laser Frigate": return 150
+		"Missile Cruiser": return 220
+		"Ion Cannon": return 450
+		"Drone Carrier": return 550
+		"Pulse Beam": return 300
+		"Gravity Well": return 600
 	return 0
 
 # Called by RoundManager

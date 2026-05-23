@@ -221,43 +221,43 @@ var profiles: Dictionary = {
 var ship_profiles: Dictionary = {
 	"Scout": {
 		"title": "STARFLEET SCOUT (LIGHT INTERCEPTOR)",
-		"cost": "💎 20 Minerals", "range": "2.0 Tiles (128 px)", "damage": "1 Hit (Direct Shot)", "fire_rate": "1.0 shots/s",
+		"cost": "💎 75 Minerals", "range": "1.5 Tiles (96 px)", "damage": "1 Hit (Direct Shot)", "fire_rate": "1.0 shots/s",
 		"desc": "Light combat vessel designed for high-frequency direct engagements. Rapid fire rate and low cost make it exceptionally reliable.",
 		"advice": "Upgradable with Hot/Cold Laser and Optical Targeting. Ideal for Pebble cleanup and Blinding Tail bypass."
 	},
 	"Laser Frigate": {
 		"title": "LASER FRIGATE (PIERCING SCANNER)",
-		"cost": "💎 35 Minerals", "range": "5.0 Tiles (320 px)", "damage": "2 Hits (Linear Pierce)", "fire_rate": "1.0 shots/s",
+		"cost": "💎 150 Minerals", "range": "3.0 Tiles (192 px)", "damage": "2 Hits (Linear Pierce)", "fire_rate": "1.0 shots/s",
 		"desc": "Heavy line-of-sight cruiser projecting concentrated laser beams that pierce all targets in their vector path.",
 		"advice": "Align along straight lanes for maximum traversal coverage. Upgradable with Hot/Cold Laser options."
 	},
 	"Missile Cruiser": {
 		"title": "MISSILE CRUISER (HEAVY ARTILLERY)",
-		"cost": "💎 45 Minerals", "range": "4.0 Tiles (256 px)", "damage": "1 Hit (96px Splash Area)", "fire_rate": "0.8 shots/s",
+		"cost": "💎 220 Minerals", "range": "2.5 Tiles (160 px)", "damage": "1 Hit (96px Splash Area)", "fire_rate": "0.8 shots/s",
 		"desc": "Tactical support platform launching long-range high-explosive missiles that deal wide area splash damage.",
 		"advice": "Deploy at tight loops and intersections. Highly vulnerable to Ring Belt and Hard Crust defensive structures."
 	},
 	"Pulse Beam": {
 		"title": "PULSE BEAM (KINETIC CONE SWEEPER)",
-		"cost": "💎 55 Minerals", "range": "3.5 Tiles (224 px)", "damage": "1 Hit (90° Sweeping Cone)", "fire_rate": "0.5 shots/s",
+		"cost": "💎 300 Minerals", "range": "2.0 Tiles (128 px)", "damage": "1 Hit (90° Sweeping Cone)", "fire_rate": "0.5 shots/s",
 		"desc": "Dynamic tactical suppressor. Evaluates the local space sector to locate the densest cluster of threats and sweeps a wide cone wave.",
 		"advice": "Its kinetic force pauses Magnetic Core regeneration for 2.0s. Excellent for massive group control."
 	},
 	"Ion Cannon": {
 		"title": "ION CANNON (ORBITAL DEMOLISHER)",
-		"cost": "💎 60 Minerals", "range": "5.0 Tiles (320 px)", "damage": "3 Hits (Heavy Single)", "fire_rate": "0.5 shots/s",
+		"cost": "💎 450 Minerals", "range": "3.0 Tiles (192 px)", "damage": "3 Hits (Heavy Single)", "fire_rate": "0.5 shots/s",
 		"desc": "Heavy particle weapon firing high-yield ion blasts that deal massive single-target disruption.",
 		"advice": "Your primary anti-armor weapon to break down Giant and Planet Chunk structures. Back up with fast Scouts."
 	},
 	"Drone Carrier": {
 		"title": "DRONE CARRIER (SWARM COMPONENT)",
-		"cost": "💎 75 Minerals", "range": "4.0 Tiles (256 px)", "damage": "1 Hit per Drone (3 Drones)", "fire_rate": "0.8 shots/s per Drone",
+		"cost": "💎 550 Minerals", "range": "2.5 Tiles (160 px)", "damage": "1 Hit per Drone (3 Drones)", "fire_rate": "0.8 shots/s per Drone",
 		"desc": "Mobile coordination hub hosting 3 interceptor drones. Drones separate to independently target different threats in range.",
 		"advice": "Perfect for broad swarm management. Drones deal 0 damage to Meteor (T3) or higher and are deflected by Ring Belt."
 	},
 	"Gravity Well": {
 		"title": "GRAVITY WELL (CHRONO-LOCK DEVICE)",
-		"cost": "💎 80 Minerals", "range": "4.0 Tiles (256 px)", "damage": "0 Hits (Cryo Freeze Wave)", "fire_rate": "0.16 shots/s (6s Cooldown)",
+		"cost": "💎 600 Minerals", "range": "3.0 Tiles (192 px)", "damage": "0 Hits (Cryo Freeze Wave)", "fire_rate": "0.16 shots/s (6s Cooldown)",
 		"desc": "High-tech support module emitting gravity waves that freeze and completely immobilize all threats in range.",
 		"advice": "Freeze durations scale inversely with mass (T1 Pebble = 4.0s down to T5 Chunk = 1.0s). Highly effective in loop zones."
 	}

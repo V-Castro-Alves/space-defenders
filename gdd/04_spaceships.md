@@ -25,13 +25,13 @@ Placed ships can be dynamically relocated to any valid tile at any time.
 
 | Ship Type | Base Cost | Reposition Fee (15% Ceil) |
 |-----------|-----------|---------------------------|
-| **Scout** | 20 | 3 minerals |
-| **Laser Frigate** | 35 | 6 minerals |
-| **Missile Cruiser** | 45 | 7 minerals |
-| **Pulse Beam** | 55 | 9 minerals |
-| **Ion Cannon** | 60 | 9 minerals |
-| **Drone Carrier** | 75 | 12 minerals |
-| **Gravity Well** | 80 | 12 minerals |
+| **Scout** | 75 | 12 minerals |
+| **Laser Frigate** | 150 | 23 minerals |
+| **Missile Cruiser** | 220 | 33 minerals |
+| **Pulse Beam** | 300 | 45 minerals |
+| **Ion Cannon** | 450 | 68 minerals |
+| **Drone Carrier** | 550 | 83 minerals |
+| **Gravity Well** | 600 | 90 minerals |
 
 ---
 
@@ -69,13 +69,13 @@ Each active offensive ship can be configured to one of four targeting priorities
 
 | Ship | Cost | Range (tiles) | Damage | Fire Rate | Shot Type | Special / Role |
 |------|------|---------------|--------|-----------|-----------|----------------|
-| **Scout** | 20 | 2.0 | 1 tier / shot | 1.0 shot/s | Weak | Cheap early defense. Upgradable to Hot/Cold Lasers and Optical Targeting. |
-| **Laser Frigate** | 35 | 5.0 | 2 tiers / shot | 1.0 shot/s | Pierce | Pierces all path targets in a straight line. Immune to Blinding Tail. Upgradable to Hot/Cold Lasers. |
-| **Missile Cruiser** | 45 | 4.0 | 1 tier + splash | 0.8 shot/s | Weak | 1.5 tile splash damage radius. Blocked by Ring Belt and Hard Crust. |
-| **Ion Cannon** | 60 | 5.0 | 3 tiers / shot | 0.5 shot/s | Heavy | Ultimate single-target chunk killer. Breaks Hard Crust. Immune to Blinding Tail. |
-| **Drone Carrier** | 75 | 4.0 | 1 tier / drone | 0.8 shot/s per drone | Weak | Spawns 3 orbiting drones that independently target separate asteroids. Drones deal 0 damage on Meteor tier and above. |
-| **Pulse Beam** | 55 | 3.5 | 1 tier in cone | 0.5 shot/s | Kinetic | 90° cone blast. Auto-rotates to target the densest cluster. Breaks Hard Crust. Pauses Magnetic regen. |
-| **Gravity Well** | 80 | 4.0 | 0 (No damage) | 6s recharge | Gravitational | Fires a field that freezes all asteroids in range. Freeze duration scales inverse to asteroid mass. Support ship. |
+| **Scout** | 75 | 1.5 | 1 tier / shot | 1.0 shot/s | Weak | Cheap early defense. Upgradable to Hot/Cold Lasers and Optical Targeting. |
+| **Laser Frigate** | 150 | 3.0 | 2 tiers / shot | 1.0 shot/s | Pierce | Pierces all path targets in a straight line. Immune to Blinding Tail. Upgradable to Hot/Cold Lasers. |
+| **Missile Cruiser** | 220 | 2.5 | 1 tier + splash | 0.8 shot/s | Weak | 1.5 tile splash damage radius. Blocked by Ring Belt and Hard Crust. |
+| **Ion Cannon** | 450 | 3.0 | 3 tiers / shot | 0.5 shot/s | Heavy | Ultimate single-target chunk killer. Breaks Hard Crust. Immune to Blinding Tail. |
+| **Drone Carrier** | 550 | 2.5 | 1 tier / drone | 0.8 shot/s per drone | Weak | Spawns 3 orbiting drones that independently target separate asteroids. Drones deal 0 damage on Meteor tier and above. |
+| **Pulse Beam** | 300 | 2.0 | 1 tier in cone | 0.5 shot/s | Kinetic | 90° cone blast. Auto-rotates to target the densest cluster. Breaks Hard Crust. Pauses Magnetic regen. |
+| **Gravity Well** | 600 | 3.0 | 0 (No damage) | 6s recharge | Gravitational | Fires a field that freezes all asteroids in range. Freeze duration scales inverse to asteroid mass. Support ship. |
 
 ---
 

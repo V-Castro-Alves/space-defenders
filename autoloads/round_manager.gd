@@ -16,25 +16,145 @@ var active_asteroids: int = 0
 var leaks_this_round: int = 0
 
 # Round structures mapping round number to details: [spawn_list, interval]
-var round_definitions: Dictionary = {
-	1: { "spawns": [1,1,1,1,1, 1,1,1,1,1], "interval": 1.5 }, # 10 Pebbles (P)
-	2: { "spawns": [1,1,1,1, 1,1,1,1, 2,2], "interval": 1.3 }, # 4P, 4P, 2 Boulders (B)
-	3: { "spawns": [1,1,1, 1,1,1, 2,2, 2,2], "interval": 1.2 }, # 3P, 3P, 2B, 2B
-	4: { "spawns": [2,2,2, 2,2,2, 2,2,2,2], "interval": 1.0 }, # 3B, 3B, 4B
-	5: { "spawns": [2, 2, {"tier": 2, "variant": "Hard Crust"}, 2, 2, 2, 3, {"tier": 3, "variant": "Magnetic Core"}], "interval": 1.0 },
-	6: { "spawns": [2, 2, {"tier": 2, "variant": "Hard Crust"}, 2, 2, 2, {"tier": 2, "variant": "Hard Crust"}, 3, 3, {"tier": 3, "variant": "Magnetic Core"}], "interval": 0.9 },
-	7: { "spawns": [2, 2, 2, 2, 2, 3, 3, {"tier": 3, "elemental": "Ice"}, {"tier": 3, "elemental": "Lava"}, {"tier": 3, "variant": "Blinding Tail"}], "interval": 0.8 },
-	8: { "spawns": [3, 3, {"tier": 3, "elemental": "Ice"}, {"tier": 3, "elemental": "Ice"}, 3, 3, {"tier": 3, "elemental": "Lava"}, 3, {"tier": 4, "variant": "Hard Crust"}], "interval": 0.8 },
-	9: { "spawns": [3, 3, {"tier": 3, "elemental": "Lava"}, {"tier": 3, "elemental": "Lava"}, 3, {"tier": 4, "variant": "Ring Belt"}, {"tier": 4, "variant": "Blinding Tail"}, {"tier": 4, "elemental": "Ice"}], "interval": 0.7 },
-	10: { "spawns": [{"tier": 4, "variant": "Ring Belt"}, {"tier": 4, "variant": "Ring Belt"}, {"tier": 4, "elemental": "Lava"}, 4, {"tier": 5, "variant": "Magnetic Core"}], "interval": 0.6 }
-}
+var round_definitions: Dictionary = {}
 
 func _ready():
 	spawn_timer = Timer.new()
 	spawn_timer.one_shot = true
 	spawn_timer.timeout.connect(_spawn_next)
 	add_child(spawn_timer)
+	_build_round_definitions()
 	reset_rounds()
+
+func _build_round_definitions():
+	round_definitions = {}
+	
+	# Round 1: 30 Pebbles (interval 0.5s)
+	var r1_spawns = []
+	for i in range(30):
+		r1_spawns.append(1)
+	round_definitions[1] = { "spawns": r1_spawns, "interval": 0.5 }
+	
+	# Round 2: 25 Pebbles, 10 Boulders (interval 0.4s)
+	var r2_spawns = []
+	for i in range(10):
+		r2_spawns.append(1)
+		r2_spawns.append(1)
+		r2_spawns.append(2)
+	for i in range(5):
+		r2_spawns.append(1)
+	round_definitions[2] = { "spawns": r2_spawns, "interval": 0.4 }
+	
+	# Round 3: 40 Pebbles, 20 Boulders (interval 0.4s)
+	var r3_spawns = []
+	for i in range(20):
+		r3_spawns.append(1)
+		r3_spawns.append(1)
+		r3_spawns.append(2)
+	round_definitions[3] = { "spawns": r3_spawns, "interval": 0.4 }
+	
+	# Round 4: 35 Boulders (some Hard Crust bottleneck) (interval 0.3s)
+	var r4_spawns = []
+	for i in range(35):
+		if i % 7 == 0:
+			r4_spawns.append({"tier": 2, "variant": "Hard Crust"})
+		else:
+			r4_spawns.append(2)
+	round_definitions[4] = { "spawns": r4_spawns, "interval": 0.3 }
+	
+	# Round 5: 20 Boulders, 8 Meteors (Variants/Elementals debut) (interval 0.3s)
+	var r5_spawns = []
+	for i in range(20):
+		r5_spawns.append(2)
+	r5_spawns.append({"tier": 3, "variant": "Magnetic Core"})
+	r5_spawns.append({"tier": 3, "elemental": "Ice"})
+	r5_spawns.append({"tier": 3, "elemental": "Lava"})
+	r5_spawns.append({"tier": 3, "variant": "Blinding Tail"})
+	r5_spawns.append(3)
+	r5_spawns.append({"tier": 3, "elemental": "Ice"})
+	r5_spawns.append({"tier": 3, "elemental": "Lava"})
+	r5_spawns.append(3)
+	round_definitions[5] = { "spawns": r5_spawns, "interval": 0.3 }
+	
+	# Round 6: 40 Boulders, 15 Meteors [Mixed Swarm] (interval 0.2s)
+	var r6_spawns = []
+	for i in range(40):
+		if i % 10 == 0:
+			r6_spawns.append({"tier": 2, "variant": "Hard Crust"})
+		else:
+			r6_spawns.append(2)
+	for i in range(15):
+		if i % 4 == 0:
+			r6_spawns.append({"tier": 3, "variant": "Magnetic Core"})
+		elif i % 4 == 1:
+			r6_spawns.append({"tier": 3, "elemental": "Ice"})
+		elif i % 4 == 2:
+			r6_spawns.append({"tier": 3, "elemental": "Lava"})
+		else:
+			r6_spawns.append({"tier": 3, "variant": "Ring Belt"})
+	round_definitions[6] = { "spawns": r6_spawns, "interval": 0.2 }
+	
+	# Round 7: 20 Meteors, 5 Giants (interval 0.2s)
+	var r7_spawns = []
+	for i in range(20):
+		if i % 5 == 0:
+			r7_spawns.append({"tier": 3, "variant": "Blinding Tail"})
+		elif i % 5 == 1:
+			r7_spawns.append({"tier": 3, "elemental": "Ice"})
+		elif i % 5 == 2:
+			r7_spawns.append({"tier": 3, "elemental": "Lava"})
+		else:
+			r7_spawns.append(3)
+	for i in range(5):
+		r7_spawns.append({"tier": 4, "variant": "Magnetic Core"})
+	round_definitions[7] = { "spawns": r7_spawns, "interval": 0.2 }
+	
+	# Round 8: 30 Meteors, 10 Giants (interval 0.2s)
+	var r8_spawns = []
+	for i in range(30):
+		if i % 6 == 0:
+			r8_spawns.append({"tier": 3, "elemental": "Ice"})
+		elif i % 6 == 1:
+			r8_spawns.append({"tier": 3, "elemental": "Lava"})
+		elif i % 6 == 2:
+			r8_spawns.append({"tier": 3, "variant": "Ring Belt"})
+		else:
+			r8_spawns.append(3)
+	for i in range(10):
+		if i % 3 == 0:
+			r8_spawns.append({"tier": 4, "variant": "Hard Crust"})
+		elif i % 3 == 1:
+			r8_spawns.append({"tier": 4, "variant": "Ring Belt"})
+		else:
+			r8_spawns.append(4)
+	round_definitions[8] = { "spawns": r8_spawns, "interval": 0.2 }
+	
+	# Round 9: 15 Giants, 2 Planet Chunks (interval 0.1s)
+	var r9_spawns = []
+	for i in range(15):
+		if i % 3 == 0:
+			r9_spawns.append({"tier": 4, "variant": "Magnetic Core"})
+		elif i % 3 == 1:
+			r9_spawns.append({"tier": 4, "elemental": "Ice"})
+		else:
+			r9_spawns.append(4)
+	r9_spawns.append({"tier": 5, "variant": "Ring Belt"})
+	r9_spawns.append(5)
+	round_definitions[9] = { "spawns": r9_spawns, "interval": 0.1 }
+	
+	# Round 10: 10 Giants, 5 Planet Chunks [End of Days] (interval 0.1s)
+	var r10_spawns = []
+	for i in range(10):
+		if i % 2 == 0:
+			r10_spawns.append({"tier": 4, "elemental": "Lava"})
+		else:
+			r10_spawns.append(4)
+	r10_spawns.append({"tier": 5, "variant": "Magnetic Core"})
+	r10_spawns.append({"tier": 5, "elemental": "Ice"})
+	r10_spawns.append({"tier": 5, "elemental": "Lava"})
+	r10_spawns.append({"tier": 5, "variant": "Ring Belt"})
+	r10_spawns.append(5)
+	round_definitions[10] = { "spawns": r10_spawns, "interval": 0.1 }
 
 func reset_rounds():
 	self.current_round = 0
@@ -67,6 +187,8 @@ func start_round():
 	for s in def["spawns"]:
 		spawn_list.append(s)
 	spawn_interval = def["interval"]
+	
+	MetricsManager.start_round(current_round)
 	
 	spawn_timer.start(0.5) # Start first spawn shortly
 
@@ -113,6 +235,8 @@ func _check_round_end():
 			var bonus = current_round * 5
 			EconomyManager.add_minerals(bonus)
 			
+		MetricsManager.end_round(current_round, leaks_this_round)
+		
 		round_completed.emit(current_round, no_leak)
 		
 		if current_round >= TOTAL_ROUNDS:

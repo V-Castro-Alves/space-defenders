@@ -35,8 +35,10 @@ func set_phase(value: GamePhase):
 	phase_changed.emit(current_phase)
 	
 	if current_phase == GamePhase.GAME_OVER:
+		MetricsManager.save_playthrough_report()
 		game_over.emit()
 	elif current_phase == GamePhase.GAME_WON:
+		MetricsManager.save_playthrough_report()
 		game_won.emit()
 
 func set_lives(value: int):

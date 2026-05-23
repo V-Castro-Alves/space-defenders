@@ -285,6 +285,7 @@ func _on_sell_pressed():
 		
 	var refund = EconomyManager.get_sell_refund(current_ship.get_total_value())
 	EconomyManager.add_minerals(refund)
+	MetricsManager.record_tower_sell(current_ship.ship_type)
 	
 	# Delete ship
 	current_ship.queue_free()

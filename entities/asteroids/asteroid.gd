@@ -148,7 +148,7 @@ func _process(delta):
 func apply_freeze(duration: float):
 	freeze_timer = max(freeze_timer, duration)
 
-func _trigger_elemental_blast(radius_pixels: float, is_shatter: bool = true):
+func _trigger_elemental_blast(radius_pixels: float, is_shatter: bool = true, source_ship: String = ""):
 	# Spawn a visual shockwave effect
 	var flash_color = Color("#38bdf8") if is_shatter else Color("#f97316") # Blue for ice, orange for lava
 	var wave = Node2D.new()
@@ -165,9 +165,9 @@ func _trigger_elemental_blast(radius_pixels: float, is_shatter: bool = true):
 		if is_instance_valid(ast) and ast != self:
 			var dist = global_position.distance_to(ast.global_position)
 			if dist <= radius_pixels:
-				ast.take_damage(1, "Reaction")
+				ast.take_damage(1, "Reaction", source_ship)
 
-func take_damage(amount: int, shot_type: String = "Weak"):
+func take_damage(amount: int, shot_type: String = "Weak", source_ship: String = ""):
 	if is_queued_for_deletion():
 		return
 		
@@ -186,8 +186,15 @@ func take_damage(amount: int, shot_type: String = "Weak"):
 	# Lava Solidification: Cold Laser cools molten exterior, deals 0 damage, converts to neutral
 	if elemental_type == "Lava" and shot_type == "ColdLaser":
 		elemental_type = "None"
+		MetricsManager.record_reaction("Solidify")
 		queue_redraw()
 		return
+		
+	# Ice Melt: Hot Laser melts ice instantly, deals normal damage but removes elemental status
+	if elemental_type == "Ice" and shot_type == "HotLaser":
+		elemental_type = "None"
+		MetricsManager.record_reaction("Melt")
+		queue_redraw()
 		
 	# Reset magnetic core timer on damage taken
 	last_damage_time = 0.0
@@ -199,27 +206,38 @@ func take_damage(amount: int, shot_type: String = "Weak"):
 		if elemental_type == "Ice":
 			if shot_type == "ColdLaser":
 				# The Shatter: normal damage + 2.0-tile (128px) shrapnel burst
-				_trigger_elemental_blast(128.0, true)
+				MetricsManager.record_reaction("Shatter")
+				_trigger_elemental_blast(128.0, true, source_ship)
 			elif shot_type == "Kinetic":
 				# Mini-Shatter: small 1.0-tile (64px) shrapnel burst
-				_trigger_elemental_blast(64.0, true)
+				MetricsManager.record_reaction("Shatter")
+				_trigger_elemental_blast(64.0, true, source_ship)
 		elif elemental_type == "Lava":
 			if shot_type == "HotLaser":
 				# The Overload: normal damage + tier-scaled massive lava explosion
+				MetricsManager.record_reaction("Overload")
 				var radius_px = 128.0 # 2.0 tiles default (T1/T2)
 				match current_tier:
 					3: radius_px = 160.0 # 2.5 tiles
 					4: radius_px = 192.0 # 3.0 tiles
 					5: radius_px = 224.0 # 3.5 tiles
-				_trigger_elemental_blast(radius_px, false)
+				_trigger_elemental_blast(radius_px, false, source_ship)
 			elif shot_type == "Kinetic":
 				# Mini-Overload: small 1.0-tile (64px) lava explosion
-				_trigger_elemental_blast(64.0, false)
+				MetricsManager.record_reaction("Overload")
+				_trigger_elemental_blast(64.0, false, source_ship)
 		
 	# Subtract from current_hp
+	var actual_damage = clamp(amount, 0, int(current_hp))
+	if source_ship != "":
+		MetricsManager.record_damage(source_ship, actual_damage)
+		
 	current_hp -= amount
 	
 	if current_hp <= 0.0:
+		if source_ship != "":
+			MetricsManager.record_kill(source_ship)
+			
 		var new_tier = current_tier - 1
 		if new_tier <= 0:
 			# Entirely destroyed
