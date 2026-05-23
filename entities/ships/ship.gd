@@ -2,13 +2,13 @@ extends Area2D
 
 var ship_type: String = "Scout"
 var display_name: String = "Scout"
-var base_cost: int = 15
-var range_tiles: float = 3.0
-var fire_rate: float = 1.5
+var base_cost: int = 20
+var range_tiles: float = 2.0
+var fire_rate: float = 1.0
 var damage: int = 1
 var ship_color: Color = Color("#22c55e")
 
-var range_pixels: float = 192.0
+var range_pixels: float = 128.0
 var targeting_mode: String = "First"
 var is_ghost: bool = false
 var is_selected: bool = false
@@ -21,6 +21,17 @@ var selected_range_color: Color = Color(0, 1, 0, 0.4)
 var drones: Array[Node2D] = []
 var drone_angle: float = 0.0
 var drone_cooldowns: Array[float] = [0.0, 0.0, 0.0]
+
+# Pulse Beam specific
+var pulse_beam_angle: float = 0.0
+
+# Upgrades state
+var laser_upgrade: String = "None" # "None", "Hot", "Cold"
+var has_optical_targeting: bool = false
+var upgrades_cost: int = 0
+
+func get_total_value() -> int:
+	return base_cost + upgrades_cost
 
 func _ready():
 	input_pickable = true
@@ -42,9 +53,9 @@ func setup_type(type: String):
 	match ship_type:
 		"Scout":
 			display_name = "Scout"
-			base_cost = 15
-			range_tiles = 3.0
-			fire_rate = 1.5
+			base_cost = 20
+			range_tiles = 2.0
+			fire_rate = 1.0
 			damage = 1
 			ship_color = Color("#22c55e") # Green
 		"Laser Frigate":
@@ -52,27 +63,34 @@ func setup_type(type: String):
 			base_cost = 35
 			range_tiles = 5.0
 			fire_rate = 1.0
-			damage = 1
+			damage = 2
 			ship_color = Color("#06b6d4") # Cyan
 		"Missile Cruiser":
 			display_name = "Missile Cruiser"
-			base_cost = 50
+			base_cost = 45
 			range_tiles = 4.0
-			fire_rate = 0.6
+			fire_rate = 0.8
 			damage = 1
 			ship_color = Color("#a855f7") # Purple
+		"Pulse Beam":
+			display_name = "Pulse Beam"
+			base_cost = 55
+			range_tiles = 3.5
+			fire_rate = 0.5
+			damage = 1
+			ship_color = Color("#f59e0b") # Warm gold
 		"Ion Cannon":
 			display_name = "Ion Cannon"
 			base_cost = 60
 			range_tiles = 5.0
-			fire_rate = 0.4
-			damage = 2
+			fire_rate = 0.5
+			damage = 3
 			ship_color = Color("#3b82f6") # Blue
 		"Drone Carrier":
 			display_name = "Drone Carrier"
 			base_cost = 75
-			range_tiles = 3.0
-			fire_rate = 1.0 # Base fire rate doesn't apply directly; drones handle it
+			range_tiles = 4.0
+			fire_rate = 0.8
 			damage = 1
 			ship_color = Color("#ec4899") # Pink
 			# Setup drones
@@ -82,12 +100,12 @@ func setup_type(type: String):
 					drone.name = "Drone_" + str(i)
 					add_child(drone)
 					drones.append(drone)
-		"Nuke Destroyer":
-			display_name = "Nuke Destroyer"
-			base_cost = 100
-			range_tiles = 7.0
-			fire_rate = 0.1 # 10s cooldown
-			damage = 1
+		"Gravity Well":
+			display_name = "Gravity Well"
+			base_cost = 80
+			range_tiles = 4.0
+			fire_rate = 1.0 / 6.0
+			damage = 0
 			ship_color = Color("#ffffff") # White
 			
 	range_pixels = range_tiles * 64.0
@@ -118,6 +136,14 @@ func _draw():
 		draw_circle(Vector2.ZERO, range_pixels, fill_color)
 		draw_arc(Vector2.ZERO, range_pixels, 0, 2*PI, 64, selected_range_color, 1.5, true)
 		
+		# For Pulse Beam, draw the 90-degree sector facing its current pulse_beam_angle
+		if ship_type == "Pulse Beam" and not is_ghost:
+			var cone_color = selected_range_color
+			cone_color.a = 0.3
+			draw_line(Vector2.ZERO, Vector2.from_angle(pulse_beam_angle - PI/4) * range_pixels, cone_color, 1.5)
+			draw_line(Vector2.ZERO, Vector2.from_angle(pulse_beam_angle + PI/4) * range_pixels, cone_color, 1.5)
+			draw_arc(Vector2.ZERO, range_pixels, pulse_beam_angle - PI/4, pulse_beam_angle + PI/4, 32, selected_range_color, 2.0, true)
+		
 	# Solid Square Representing Ship
 	draw_rect(Rect2(-24, -24, 48, 48), ship_color)
 	# Accent borders
@@ -139,18 +165,22 @@ func _draw():
 			# Rocket cross
 			draw_rect(Rect2(-6, -18, 12, 36), Color.BLACK)
 			draw_rect(Rect2(-18, -6, 36, 12), Color.BLACK)
+		"Pulse Beam":
+			# 3 concentric arcs for broad sweeps
+			draw_arc(Vector2.ZERO, 8.0, -PI/4, PI/4, 8, Color.BLACK, 2.0)
+			draw_arc(Vector2.ZERO, 14.0, -PI/4, PI/4, 8, Color.BLACK, 2.0)
+			draw_line(Vector2.ZERO, Vector2(12, 0), Color.BLACK, 2.0)
 		"Ion Cannon":
 			# Heavy barrel indicator
 			draw_rect(Rect2(-8, -20, 16, 12), Color.BLACK)
 		"Drone Carrier":
 			# Inner core
 			draw_circle(Vector2.ZERO, 6.0, Color.BLACK)
-		"Nuke Destroyer":
-			# Hazard symbol/black dots
-			draw_circle(Vector2.ZERO, 8.0, Color.BLACK)
-			draw_circle(Vector2(-10, -6), 4.0, Color.BLACK)
-			draw_circle(Vector2(10, -6), 4.0, Color.BLACK)
-			draw_circle(Vector2(0, 10), 4.0, Color.BLACK)
+		"Gravity Well":
+			# Spiral/concentric ripples inside block
+			draw_circle(Vector2.ZERO, 16.0, Color.BLACK, false, 1.5)
+			draw_circle(Vector2.ZERO, 8.0, Color.BLACK, false, 1.5)
+			draw_circle(Vector2.ZERO, 3.0, Color.BLACK)
 
 	# Draw drones programmatically for Carrier
 	if ship_type == "Drone Carrier" and not is_ghost:
@@ -164,6 +194,11 @@ func _process(delta):
 	if is_ghost:
 		return
 		
+	# Handle Pulse Beam auto-rotation sweep even when not firing, to look alive
+	if ship_type == "Pulse Beam":
+		pulse_beam_angle = get_densest_cluster_angle()
+		queue_redraw()
+
 	# Handle shooting cooldowns
 	if fire_cooldown > 0.0:
 		fire_cooldown -= delta
@@ -175,12 +210,67 @@ func _process(delta):
 		drone_angle += delta * 2.0
 		queue_redraw()
 		
-		# Process drone shooting
+		# Process distributive drone shooting
+		var targets = get_asteroids_in_range()
+		targets = sort_asteroids_by_targeting_mode(targets)
+		
 		for i in range(drones.size()):
 			if drone_cooldowns[i] > 0.0:
 				drone_cooldowns[i] -= delta
 			else:
-				_shoot_drone(i)
+				var t = null
+				if i < targets.size():
+					t = targets[i]
+				elif not targets.is_empty():
+					t = targets[0]
+					
+				if t:
+					_shoot_drone(i, t)
+
+func sort_asteroids_by_targeting_mode(list: Array) -> Array:
+	var sorted = list.duplicate()
+	match targeting_mode:
+		"First":
+			sorted.sort_custom(func(a, b): return a.progress > b.progress)
+		"Last":
+			sorted.sort_custom(func(a, b): return a.progress < b.progress)
+		"Strongest":
+			sorted.sort_custom(func(a, b):
+				if a.current_tier != b.current_tier:
+					return a.current_tier > b.current_tier
+				return a.progress > b.progress
+			)
+		"Closest":
+			sorted.sort_custom(func(a, b):
+				return global_position.distance_to(a.global_position) < global_position.distance_to(b.global_position)
+			)
+	return sorted
+
+func get_densest_cluster_angle() -> float:
+	var list = get_asteroids_in_range()
+	if list.is_empty():
+		return 0.0
+		
+	var best_angle = 0.0
+	var max_count = -1
+	
+	# Sweep 36 steps (every 10 degrees)
+	for step in range(36):
+		var angle = step * (PI / 18.0)
+		var count = 0
+		for ast in list:
+			var relative_vector = ast.global_position - global_position
+			var angle_to_ast = relative_vector.angle()
+			var angle_diff = abs(angle_to_local_angle(angle_to_ast - angle))
+			if angle_diff <= PI / 4.0: # 45 degrees either side = 90 degree cone
+				count += 1
+		if count > max_count:
+			max_count = count
+			best_angle = angle
+	return best_angle
+
+func angle_to_local_angle(a: float) -> float:
+	return fposmod(a + PI, 2 * PI) - PI
 
 func get_asteroids_in_range() -> Array:
 	var in_range = []
@@ -189,6 +279,13 @@ func get_asteroids_in_range() -> Array:
 		if is_instance_valid(ast):
 			var dist = global_position.distance_to(ast.global_position)
 			if dist <= range_pixels:
+				# Blinding Tail check
+				if ast.variant == "Blinding Tail" and dist <= 192.0:
+					if ship_type == "Missile Cruiser" or ship_type == "Drone Carrier":
+						continue # Blinded!
+					if ship_type == "Scout" and not has_optical_targeting:
+						continue # Blinded!
+						
 				in_range.append(ast)
 	return in_range
 
@@ -228,7 +325,38 @@ func get_best_target() -> Node2D:
 					best = ast
 	return best
 
+func get_freeze_duration(tier: int) -> float:
+	match tier:
+		1: return 4.0
+		2: return 3.0
+		3: return 2.0
+		4: return 1.5
+		5: return 1.0
+	return 0.0
+
 func _shoot():
+	# Gravity Well does not need a target to pulse, it just pulses if any asteroids are in range
+	if ship_type == "Gravity Well":
+		var list = get_asteroids_in_range()
+		if list.is_empty():
+			return
+		fire_cooldown = 1.0 / fire_rate
+		
+		# Spawn visual pulse effect
+		var wave = Node2D.new()
+		wave.set_script(preload("res://entities/ships/gravity_well_effect.gd"))
+		wave.start_pos = global_position
+		wave.range_radius = range_pixels
+		wave.effect_color = ship_color
+		wave.global_position = global_position
+		get_parent().add_child(wave)
+		
+		# Freeze all asteroids in range
+		for ast in list:
+			if is_instance_valid(ast) and ast.has_method("apply_freeze"):
+				ast.apply_freeze(get_freeze_duration(ast.current_tier))
+		return
+
 	var target = get_best_target()
 	if not target:
 		return
@@ -236,7 +364,28 @@ func _shoot():
 	fire_cooldown = 1.0 / fire_rate
 	
 	match ship_type:
-		"Scout", "Ion Cannon":
+		"Scout":
+			# Spawn standard homing projectile
+			var proj_scene = load("res://entities/projectiles/projectile.tscn")
+			var p = proj_scene.instantiate()
+			p.damage = damage
+			p.target = target
+			p.global_position = global_position
+			
+			var p_color = ship_color
+			var s_type = "Weak"
+			if laser_upgrade == "Hot":
+				p_color = Color("#f97316") # Orange
+				s_type = "HotLaser"
+			elif laser_upgrade == "Cold":
+				p_color = Color("#38bdf8") # Ice Blue
+				s_type = "ColdLaser"
+				
+			p.projectile_color = p_color
+			p.shot_type = s_type
+			get_parent().add_child(p)
+			
+		"Ion Cannon":
 			# Spawn standard homing projectile
 			var proj_scene = load("res://entities/projectiles/projectile.tscn")
 			var p = proj_scene.instantiate()
@@ -244,6 +393,7 @@ func _shoot():
 			p.target = target
 			p.global_position = global_position
 			p.projectile_color = ship_color
+			p.shot_type = "Heavy"
 			get_parent().add_child(p)
 			
 		"Missile Cruiser":
@@ -255,6 +405,7 @@ func _shoot():
 			p.splash_radius = 96.0 # 1.5 tiles
 			p.global_position = global_position
 			p.projectile_color = ship_color
+			p.shot_type = "Weak"
 			get_parent().add_child(p)
 			
 		"Laser Frigate":
@@ -266,7 +417,17 @@ func _shoot():
 			beam.set_script(preload("res://entities/ships/laser_beam_effect.gd"))
 			beam.start_pos = global_position
 			beam.end_pos = end_pos
-			beam.beam_color = ship_color
+			
+			var l_color = ship_color
+			var s_type = "Pierce"
+			if laser_upgrade == "Hot":
+				l_color = Color("#f97316")
+				s_type = "HotLaser"
+			elif laser_upgrade == "Cold":
+				l_color = Color("#38bdf8")
+				s_type = "ColdLaser"
+				
+			beam.beam_color = l_color
 			get_parent().add_child(beam)
 			
 			# Pierce damage check
@@ -276,26 +437,38 @@ func _shoot():
 					# Check distance from asteroid point to laser line segment
 					var closest = Geometry2D.get_closest_point_to_segment(ast.global_position, global_position, end_pos)
 					if ast.global_position.distance_to(closest) < (ast.size / 2.0 + 8.0):
-						ast.take_damage(damage)
+						ast.take_damage(damage, s_type)
 						
-		"Nuke Destroyer":
-			# Screen clear explosion
-			# Visual flash effect in main scene
-			get_tree().call_group("main", "spawn_nuke_flash")
+		"Pulse Beam":
+			# Sweep to densest cluster center and lock rotation
+			pulse_beam_angle = get_densest_cluster_angle()
+			queue_redraw()
 			
-			# Apply 1 damage (split) to every single active asteroid
-			var asteroids = get_tree().get_nodes_in_group("asteroids")
+			# Spawn visual cone blast effect
+			var beam = Node2D.new()
+			beam.set_script(preload("res://entities/ships/pulse_beam_effect.gd"))
+			beam.start_pos = global_position
+			beam.direction_angle = pulse_beam_angle
+			beam.range_radius = range_pixels
+			beam.beam_color = ship_color
+			beam.global_position = global_position
+			get_parent().add_child(beam)
+			
+			# Apply damage to all asteroids in cone
+			var asteroids = get_asteroids_in_range()
 			for ast in asteroids:
 				if is_instance_valid(ast):
-					ast.take_damage(1)
+					var relative_vector = ast.global_position - global_position
+					var angle_to_ast = relative_vector.angle()
+					var angle_diff = abs(angle_to_local_angle(angle_to_ast - pulse_beam_angle))
+					if angle_diff <= PI / 4.0:
+						ast.take_damage(damage, "Kinetic")
 
-func _shoot_drone(index: int):
-	# Find a target within range
-	var target = get_best_target()
-	if not target:
+func _shoot_drone(index: int, drone_target: Node2D):
+	if not is_instance_valid(drone_target):
 		return
 		
-	drone_cooldowns[index] = 0.6 # Drones fire fast!
+	drone_cooldowns[index] = 1.25 # Drones fire rate 0.8 shot/s (cooldown 1.25s)
 	
 	var angle = drone_angle + (index * PI * 2.0 / 3.0)
 	var d_pos = global_position + Vector2.from_angle(angle) * 44.0
@@ -304,8 +477,9 @@ func _shoot_drone(index: int):
 	var proj_scene = load("res://entities/projectiles/projectile.tscn")
 	var p = proj_scene.instantiate()
 	p.damage = 1
-	p.target = target
+	p.target = drone_target
 	p.speed = 800.0 # Drone shots are fast
 	p.global_position = d_pos
 	p.projectile_color = Color("#f472b6")
+	p.shot_type = "Drone"
 	get_parent().add_child(p)

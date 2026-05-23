@@ -9,7 +9,7 @@ const TOTAL_WAVES: int = 10
 var current_wave: int = 0 : set = set_wave
 var wave_active: bool = false
 var spawn_timer: Timer
-var spawn_list: Array[int] = []
+var spawn_list: Array = []
 var spawn_interval: float = 1.0
 
 var active_asteroids: int = 0
@@ -21,12 +21,12 @@ var wave_definitions: Dictionary = {
 	2: { "spawns": [1,1,1,1, 1,1,1,1, 2,2], "interval": 1.3 }, # 4P, 4P, 2 Boulders (B)
 	3: { "spawns": [1,1,1, 1,1,1, 2,2, 2,2], "interval": 1.2 }, # 3P, 3P, 2B, 2B
 	4: { "spawns": [2,2,2, 2,2,2, 2,2,2,2], "interval": 1.0 }, # 3B, 3B, 4B
-	5: { "spawns": [2,2,2, 2,2,2, 3,3], "interval": 1.0 }, # 3B, 3B, 2 Meteors (M)
-	6: { "spawns": [2,2,2,2, 2,2,2,2, 3,3,3], "interval": 0.9 }, # 4B, 4B, 3M
-	7: { "spawns": [2,2,2, 2,2, 3,3,3, 3,3], "interval": 0.8 }, # 3B, 2B, 3M, 2M
-	8: { "spawns": [3,3,3,3, 3,3,3,3, 4], "interval": 0.8 }, # 4M, 4M, 1 Giant (G)
-	9: { "spawns": [3,3,3, 3,3, 4,4, 4], "interval": 0.7 }, # 3M, 2M, 2G, 1G
-	10: { "spawns": [4,4, 4,4, 5], "interval": 0.6 } # 2G, 2G, 1 Planet Chunk (PC)
+	5: { "spawns": [2, 2, {"tier": 2, "variant": "Hard Crust"}, 2, 2, 2, 3, {"tier": 3, "variant": "Magnetic Core"}], "interval": 1.0 },
+	6: { "spawns": [2, 2, {"tier": 2, "variant": "Hard Crust"}, 2, 2, 2, {"tier": 2, "variant": "Hard Crust"}, 3, 3, {"tier": 3, "variant": "Magnetic Core"}], "interval": 0.9 },
+	7: { "spawns": [2, 2, 2, 2, 2, 3, 3, {"tier": 3, "elemental": "Ice"}, {"tier": 3, "elemental": "Lava"}, {"tier": 3, "variant": "Blinding Tail"}], "interval": 0.8 },
+	8: { "spawns": [3, 3, {"tier": 3, "elemental": "Ice"}, {"tier": 3, "elemental": "Ice"}, 3, 3, {"tier": 3, "elemental": "Lava"}, 3, {"tier": 4, "variant": "Hard Crust"}], "interval": 0.8 },
+	9: { "spawns": [3, 3, {"tier": 3, "elemental": "Lava"}, {"tier": 3, "elemental": "Lava"}, 3, {"tier": 4, "variant": "Ring Belt"}, {"tier": 4, "variant": "Blinding Tail"}, {"tier": 4, "elemental": "Ice"}], "interval": 0.7 },
+	10: { "spawns": [{"tier": 4, "variant": "Ring Belt"}, {"tier": 4, "variant": "Ring Belt"}, {"tier": 4, "elemental": "Lava"}, 4, {"tier": 5, "variant": "Magnetic Core"}], "interval": 0.6 }
 }
 
 func _ready():
@@ -65,7 +65,7 @@ func start_wave():
 	var def = wave_definitions.get(current_wave, wave_definitions[1])
 	spawn_list.clear()
 	for s in def["spawns"]:
-		spawn_list.append(s as int)
+		spawn_list.append(s)
 	spawn_interval = def["interval"]
 	
 	spawn_timer.start(0.5) # Start first spawn shortly
@@ -74,9 +74,20 @@ func _spawn_next():
 	if spawn_list.is_empty():
 		return
 		
-	var tier = spawn_list.pop_front()
+	var spawn_data = spawn_list.pop_front()
+	var tier = 1
+	var variant = "None"
+	var elemental = "None"
+	
+	if spawn_data is Dictionary:
+		tier = spawn_data.get("tier", 1)
+		variant = spawn_data.get("variant", "None")
+		elemental = spawn_data.get("elemental", "None")
+	else:
+		tier = spawn_data as int
+		
 	# Spawn in the main scene
-	get_tree().call_group("main", "spawn_asteroid", tier, 0.0)
+	get_tree().call_group("main", "spawn_asteroid", tier, 0.0, variant, elemental)
 	
 	if not spawn_list.is_empty():
 		# Start timer for next spawn, considering current speed scale

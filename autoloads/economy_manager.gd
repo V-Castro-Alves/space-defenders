@@ -15,9 +15,11 @@ func set_minerals(value: int):
 	minerals_changed.emit(minerals)
 
 func can_afford(amount: int) -> bool:
-	return minerals >= amount
+	return GameManager.dev_mode or minerals >= amount
 
 func spend_minerals(amount: int) -> bool:
+	if GameManager.dev_mode:
+		return true
 	if can_afford(amount):
 		self.minerals -= amount
 		return true

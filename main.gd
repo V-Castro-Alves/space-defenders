@@ -80,6 +80,11 @@ func _ready():
 	var hud = hud_scene.instantiate()
 	add_child(hud)
 	
+	# Load Main Menu overlay at start in PRE_GAME phase
+	var menu_class = load("res://ui/main_menu.gd")
+	var menu = menu_class.new()
+	add_child(menu)
+	
 	# Setup starting ships (Scouts) - removed so board starts completely empty
 
 func _process(_delta):
@@ -256,19 +261,22 @@ func _spawn_placed_ship(type: String, pos: Vector2):
 
 func _get_ship_cost(type: String) -> int:
 	match type:
-		"Scout": return 15
+		"Scout": return 20
 		"Laser Frigate": return 35
-		"Missile Cruiser": return 50
+		"Missile Cruiser": return 45
 		"Ion Cannon": return 60
 		"Drone Carrier": return 75
-		"Nuke Destroyer": return 100
+		"Pulse Beam": return 55
+		"Gravity Well": return 80
 	return 0
 
 # Called by WaveManager
-func spawn_asteroid(tier: int, custom_progress: float):
+func spawn_asteroid(tier: int, custom_progress: float, custom_variant: String = "None", custom_elemental: String = "None"):
 	var asteroid_scene = load("res://entities/asteroids/asteroid.tscn")
 	var a = asteroid_scene.instantiate()
 	a.current_tier = tier
+	a.variant = custom_variant
+	a.elemental_type = custom_elemental
 	path_node.add_child(a)
 	a.progress = custom_progress
 

@@ -14,9 +14,10 @@ enum GamePhase {
 	GAME_WON
 }
 
-var current_phase: GamePhase = GamePhase.WAVE_PREPARATION : set = set_phase
+var current_phase: GamePhase = GamePhase.PRE_GAME : set = set_phase
 var lives: int = 20 : set = set_lives
 var speed_multiplier: float = 1.0 : set = set_speed_multiplier
+var dev_mode: bool = false
 
 func _ready():
 	reset_game()
@@ -24,7 +25,8 @@ func _ready():
 func reset_game():
 	self.lives = 20
 	self.speed_multiplier = 1.0
-	self.current_phase = GamePhase.WAVE_PREPARATION
+	self.current_phase = GamePhase.PRE_GAME
+	dev_mode = false
 
 func set_phase(value: GamePhase):
 	if current_phase == value:
@@ -56,5 +58,7 @@ func toggle_speed():
 
 func lose_lives(amount: int):
 	if current_phase == GamePhase.GAME_OVER or current_phase == GamePhase.GAME_WON:
+		return
+	if dev_mode:
 		return
 	self.lives -= amount

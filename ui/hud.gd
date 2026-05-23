@@ -8,13 +8,14 @@ var launch_btn: Button
 var shop_buttons: Dictionary = {}
 
 var ship_panel: Control
+var hud_root: Control
 
 func _ready():
 	# Screen boundaries (Control node setup)
-	var root = Control.new()
-	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(root)
+	hud_root = Control.new()
+	hud_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	hud_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(hud_root)
 	
 	# Top bar container
 	var top_bar = HBoxContainer.new()
@@ -22,7 +23,7 @@ func _ready():
 	top_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	top_bar.position = Vector2(40, 30)
 	top_bar.add_theme_constant_override("separation", 24)
-	root.add_child(top_bar)
+	hud_root.add_child(top_bar)
 	
 	# Styles for Panels (Glassmorphism styling)
 	var panel_style = StyleBoxFlat.new()
@@ -132,9 +133,9 @@ func _ready():
 	shop_panel_container.add_theme_stylebox_override("panel", shop_style)
 	
 	# Positioning shop container
-	shop_panel_container.custom_minimum_size = Vector2(1360, 136)
-	shop_panel_container.position = Vector2(2048.0 / 2.0 - 1360.0 / 2.0, 1152.0 - 136.0)
-	root.add_child(shop_panel_container)
+	shop_panel_container.custom_minimum_size = Vector2(1540, 136)
+	shop_panel_container.position = Vector2(2048.0 / 2.0 - 1540.0 / 2.0, 1152.0 - 136.0)
+	hud_root.add_child(shop_panel_container)
 	
 	var shop_margin = MarginContainer.new()
 	shop_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -149,14 +150,15 @@ func _ready():
 	shop_hbox.add_theme_constant_override("separation", 24)
 	shop_margin.add_child(shop_hbox)
 	
-	# Registering the 6 shop items [Ship Name, cost, color]
+	# Registering the 7 shop items [Ship Name, cost, color]
 	var shop_items = [
-		{"name": "Scout", "cost": 15, "color": Color("#22c55e")},
+		{"name": "Scout", "cost": 20, "color": Color("#22c55e")},
 		{"name": "Laser Frigate", "cost": 35, "color": Color("#06b6d4")},
-		{"name": "Missile Cruiser", "cost": 50, "color": Color("#a855f7")},
+		{"name": "Missile Cruiser", "cost": 45, "color": Color("#a855f7")},
+		{"name": "Pulse Beam", "cost": 55, "color": Color("#f59e0b")},
 		{"name": "Ion Cannon", "cost": 60, "color": Color("#3b82f6")},
 		{"name": "Drone Carrier", "cost": 75, "color": Color("#ec4899")},
-		{"name": "Nuke Destroyer", "cost": 100, "color": Color("#ffffff")}
+		{"name": "Gravity Well", "cost": 80, "color": Color("#ffffff")}
 	]
 	
 	for item in shop_items:
@@ -207,7 +209,7 @@ func _ready():
 	launch_btn.add_theme_stylebox_override("disabled", launch_style)
 	
 	launch_btn.pressed.connect(func(): WaveManager.start_wave())
-	root.add_child(launch_btn)
+	hud_root.add_child(launch_btn)
 	
 	# Context Ship Panel upgrade/sell/reposition
 	var panel_scene = load("res://ui/ship_panel.tscn")
@@ -228,8 +230,20 @@ func _ready():
 	_update_shop_buttons()
 
 func _update_hud():
-	lives_label.text = "❤️ LIVES: %d / 20" % GameManager.lives
-	minerals_label.text = "💎 MINERALS: %d" % EconomyManager.minerals
+	if GameManager.current_phase == GameManager.GamePhase.PRE_GAME:
+		hud_root.visible = false
+		return
+	else:
+		hud_root.visible = true
+		
+	# Format Dev Mode text beautifully
+	if GameManager.dev_mode:
+		lives_label.text = "❤️ LIVES: ♾️"
+		minerals_label.text = "💎 MINERALS: ♾️"
+	else:
+		lives_label.text = "❤️ LIVES: %d / 20" % GameManager.lives
+		minerals_label.text = "💎 MINERALS: %d" % EconomyManager.minerals
+		
 	wave_label.text = "🌊 WAVE: %d / 10" % WaveManager.current_wave
 	speed_btn.text = "SPEED: %.0fx" % GameManager.speed_multiplier
 	
